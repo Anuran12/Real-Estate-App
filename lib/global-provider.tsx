@@ -40,9 +40,9 @@ export const GlobalProvider = ({ children }: GlobalProviderProps) => {
 
   const isLogged = !!user;
 
-  if (process.env.NODE_ENV === "development") {
-    console.log("User data:", user);
-  }
+  // if (process.env.NODE_ENV === "development") {
+  //   console.log("User data:", user);
+  // }
 
   return (
     <GlobalContext.Provider
