@@ -1,11 +1,26 @@
-import { Account, Avatars, Client, OAuthProvider } from "react-native-appwrite";
+import {
+  Account,
+  Avatars,
+  Client,
+  Databases,
+  OAuthProvider,
+} from "react-native-appwrite";
 import * as Linking from "expo-linking";
 import { openAuthSessionAsync } from "expo-web-browser";
+import { router } from "expo-router";
+import { useEffect } from "react";
 
 export const config = {
   platform: "com.anu.restate",
   endpoint: process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT,
   projectId: process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID,
+  databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
+  galleriesCollectionId:
+    process.env.EXPO_PUBLIC_APPWRITE_GALLERIES_COLLECTION_ID,
+  reviewsCollectionId: process.env.EXPO_PUBLIC_APPWRITE_REVIEWS_COLLECTION_ID,
+  agentsCollectionId: process.env.EXPO_PUBLIC_APPWRITE_AGENTS_COLLECTION_ID,
+  propertiesCollectionId:
+    process.env.EXPO_PUBLIC_APPWRITE_PROPERTIES_COLLECTION_ID,
 };
 
 export const client = new Client();
@@ -17,6 +32,48 @@ client
 
 export const avatar = new Avatars(client);
 export const account = new Account(client);
+export const databases = new Databases(client);
+
+export function useCheckSession() {
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const user = await getCurrentUser();
+        console.log(user);
+
+        if (!user) {
+          // No user found, redirect to sign-in
+          router.replace("/sign-in");
+        }
+      } catch (error) {
+        console.error("Session check failed:", error);
+        // On error, redirect to sign-in as a safety measure
+        router.replace("/sign-in");
+      }
+    };
+
+    checkSession();
+  }, []); // Empty dependency array means this runs once when component mounts
+}
+
+// Alternative: If you prefer a regular function over a hook
+export async function checkSession(shouldRedirect = true) {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user && shouldRedirect) {
+      router.replace("/sign-in");
+    }
+
+    return !!user; // Returns true if user is logged in, false otherwise
+  } catch (error) {
+    console.error("Session check failed:", error);
+    if (shouldRedirect) {
+      router.replace("/sign-in");
+    }
+    return false;
+  }
+}
 
 export async function login() {
   try {

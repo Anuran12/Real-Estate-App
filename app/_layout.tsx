@@ -21,7 +21,7 @@ export default function RootLayout() {
   }, [fontLoaded]);
   if (!fontLoaded) return null;
   return (
-    <GlobalProvider>
+    <GlobalProvider requireAuth={true} allowedPaths={["/sign-in"]}>
       <Stack screenOptions={{ headerShown: false }} />
     </GlobalProvider>
   );
